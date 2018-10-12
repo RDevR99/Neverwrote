@@ -24,7 +24,7 @@ window.main = function (initialState) {
   ReactDOM.render(rootComponent, mountPoint);
 };
 
-},{"./components/Root":10,"./helpers/createStore":14,"react":"react","react-dom":"react-dom"}],2:[function(require,module,exports){
+},{"./components/Root":10,"./helpers/createStore":15,"react":"react","react-dom":"react-dom"}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -487,11 +487,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var ReactRedux = require('react-redux');
-
+var _ = require('lodash');
 var createActionDispatchers = require('../helpers/createActionDispatchers');
 var notebooksActionCreators = require('../reducers/notebooks');
 var NotebookNew = require('./NotebookNew');
 var NoteNew = require('./NoteNew');
+var Search = require('./Search');
 
 /*
   *** TODO: Build more functionality into the NotebookList component ***
@@ -506,7 +507,15 @@ var ActiveNotebook = function (_React$Component) {
   function ActiveNotebook(props) {
     _classCallCheck(this, ActiveNotebook);
 
-    return _possibleConstructorReturn(this, (ActiveNotebook.__proto__ || Object.getPrototypeOf(ActiveNotebook)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (ActiveNotebook.__proto__ || Object.getPrototypeOf(ActiveNotebook)).call(this, props));
+
+    alert(_this.props.notes);
+    _this.state = {
+      phrase: '',
+      tempNotes: _this.props.notes
+    };
+
+    return _this;
   }
 
   _createClass(ActiveNotebook, [{
@@ -525,14 +534,53 @@ var ActiveNotebook = function (_React$Component) {
       var onClickNotebook = function onClickNotebook(event) {
         event.preventDefault();
         _this2.props.loadNotes(_this2.props.notebook.id);
-        //should i make another call to a method that can solve this problem?
-        //a method that can change the state.. call to the reducer
       };
 
       var onDeleteNotebookButtonClick = function onDeleteNotebookButtonClick(event) {
         _this2.props.deleteNotebook(_this2.props.notebook.id);
       };
-      //made a button bigger when active
+
+      var clearInput = function clearInput() {
+        _this2.setState({
+          phrase: ''
+        });
+      };
+
+      var onSearching = function onSearching(event) {
+        //The setState is somehow not updating hte phrase/
+        //alert(event.target.value);//This is showing some values
+        var phrase = event.target.value;
+
+        _this2.setState({ phrase: phrase });
+        //resetSearchbar();
+        //onSearch(this.state.phrase);
+
+        //
+        onSearch(phrase);
+        //right now we can make seargch as you type we can implement a button too
+      };
+
+      var onSearch = function onSearch(phrase) {
+
+        var tempNotes = [];
+        _this2.setState({ tempNotes: tempNotes });
+
+        _this2.props.notes.map(function (note) {
+
+          if (note.title.contains(phrase)) {
+            tempNotes.push(note);
+          } else if (note.title.search(phrase) === -1 && note.content.search(phrase) === -1) {} else {
+            tempNotes.push(note);
+          }
+          //we first need notes in its state
+          //this will create anoter notes, array of note (IDs of whom to display)
+        });
+        //It will return an array of notes
+        //And instead of directly mapping from notes state to create notes, we use this array to map notes
+        _this2.setState({ tempNotes: tempNotes });
+        console.table(tempNotes);
+      };
+
       return React.createElement(
         'li',
         { className: 'UnorderedListChildNB' },
@@ -548,17 +596,45 @@ var ActiveNotebook = function (_React$Component) {
         ),
         React.createElement(
           'div',
-          { className: 'Notes' },
+          null,
           React.createElement(
-            'h3',
-            null,
-            'Notes',
-            React.createElement(NoteNew, { createNote: this.props.createNote, notebookId: this.props.activeNotebookId })
+            'div',
+            { className: 'input-group' },
+            React.createElement('input', {
+              className: 'form-control input-lg',
+              value: this.state.phrase,
+              placeholder: 'Search....',
+              onChange: onSearching
+
+            }),
+            React.createElement(
+              'div',
+              { className: 'input-group-btn' },
+              React.createElement(
+                'button',
+                {
+                  className: 'btn btn-warning btn-lg',
+                  style: { marginRight: '12px' },
+                  onClick: clearInput
+                },
+                React.createElement('i', { className: 'fa fa-eraser' })
+              )
+            )
           ),
           React.createElement(
-            'ol',
-            null,
-            this.props.notes.map(createNote)
+            'div',
+            { className: 'Notes' },
+            React.createElement(
+              'h3',
+              null,
+              'Notes',
+              React.createElement(NoteNew, { createNote: createNote, notebookId: this.props.activeNotebookId })
+            ),
+            React.createElement(
+              'ol',
+              null,
+              this.state.tempNotes.map(createNote)
+            )
           )
         )
       );
@@ -778,7 +854,7 @@ var NotebookListContainer = ReactRedux.connect(function (state) {
 
 module.exports = NotebookListContainer;
 
-},{"../helpers/createActionDispatchers":13,"../reducers/notebooks":16,"./NoteNew":6,"./NotebookNew":9,"react":"react","react-redux":"react-redux"}],9:[function(require,module,exports){
+},{"../helpers/createActionDispatchers":14,"../reducers/notebooks":17,"./NoteNew":6,"./NotebookNew":9,"./Search":11,"lodash":"lodash","react":"react","react-redux":"react-redux"}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -893,6 +969,138 @@ module.exports = Root;
 },{"./DevTools":2,"./Home":3,"react":"react","react-redux":"react-redux"}],11:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+var _ = require('lodash');
+var NoteNew = require('./NoteNew');
+
+var Search = function (_React$Component) {
+  _inherits(Search, _React$Component);
+
+  function Search(props) {
+    _classCallCheck(this, Search);
+
+    //const createNote = props.createNote;
+    //const activeNotebookId = props.activeNotebookId;
+    //const notes = props.notes;
+
+    var _this = _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).call(this, props));
+
+    _this.state = {
+      phrase: '',
+      tempNotes: []
+    };
+    return _this;
+  }
+
+  _createClass(Search, [{
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var clearInput = function clearInput() {
+        _this2.setState({
+          phrase: ''
+        });
+      };
+
+      var onSearching = function onSearching(event) {
+        //The setState is somehow not updating hte phrase/
+        //alert(event.target.value);//This is showing some values
+        var phrase = event.target.value;
+
+        _this2.setState({ phrase: phrase });
+        //resetSearchbar();
+        //onSearch(this.state.phrase);
+
+        //
+        onSearch(phrase);
+        //right now we can make seargch as you type we can implement a button too
+      };
+
+      var onSearch = function onSearch(phrase) {
+
+        var tempNotes = [];
+        console.log(_this2.props.notes);
+        _this2.props.notes.map(function (note) {
+          console.log('hi');
+          //the problem is with phrases
+          if (note.title.contains(phrase)) {
+            console.log('hi again');
+            tempNotes.push(note);
+          } else if (note.title.search(phrase) === -1 && note.content.search(phrase) === -1) {} else {
+            tempNotes.push(note);
+          }
+          //we first need notes in its state
+          //this will create anoter notes, array of note (IDs of whom to display)
+        });
+        //It will return an array of notes
+        //And instead of directly mapping from notes state to create notes, we use this array to map notes
+        _this2.setState({ tempNotes: tempNotes });
+        console.table(tempNotes);
+      };
+
+      return React.createElement(
+        'div',
+        null,
+        React.createElement(
+          'div',
+          { className: 'input-group' },
+          React.createElement('input', {
+            className: 'form-control input-lg',
+            value: this.state.phrase,
+            placeholder: 'Search....',
+            onChange: onSearching
+
+          }),
+          React.createElement(
+            'div',
+            { className: 'input-group-btn' },
+            React.createElement(
+              'button',
+              {
+                className: 'btn btn-warning btn-lg',
+                style: { marginRight: '12px' },
+                onClick: clearInput
+              },
+              React.createElement('i', { className: 'fa fa-eraser' })
+            )
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: 'Notes' },
+          React.createElement(
+            'h3',
+            null,
+            'Notes',
+            React.createElement(NoteNew, { createNote: this.props.createNote, notebookId: this.props.activeNotebookId })
+          ),
+          React.createElement(
+            'ol',
+            null,
+            this.state.tempNotes.map(this.props.createNote)
+          )
+        )
+      );
+    }
+  }]);
+
+  return Search;
+}(React.Component);
+
+module.exports = Search;
+
+},{"./NoteNew":6,"lodash":"lodash","react":"react"}],12:[function(require,module,exports){
+'use strict';
+
 /**
  * This helper file provides a set of functions for performing HTTP requests.
  * It will work on both the backend and the frontend.
@@ -948,7 +1156,7 @@ if (true) {
 
 module.exports = ajax;
 
-},{"request":"request"}],12:[function(require,module,exports){
+},{"request":"request"}],13:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1002,7 +1210,7 @@ api.delete = function (path) {
 
 module.exports = api;
 
-},{"./ajax":11}],13:[function(require,module,exports){
+},{"./ajax":12}],14:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1039,7 +1247,7 @@ var createActionDispatchers = function createActionDispatchers() {
 
 module.exports = createActionDispatchers;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1072,7 +1280,7 @@ module.exports = function (initialState) {
   return finalCreateStore(combinedReducers, initialState);
 };
 
-},{"../components/DevTools":2,"../reducers":15,"redux":"redux","redux-thunk":"redux-thunk"}],15:[function(require,module,exports){
+},{"../components/DevTools":2,"../reducers":16,"redux":"redux","redux-thunk":"redux-thunk"}],16:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1088,7 +1296,7 @@ module.exports = Redux.combineReducers({
   // eg. `notes: require('./notes')` if you have a reducer in reducers/notes.js
 });
 
-},{"./notebooks":16,"redux":"redux"}],16:[function(require,module,exports){
+},{"./notebooks":17,"redux":"redux"}],17:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash');
@@ -1211,6 +1419,6 @@ reducer.deleteNote = function (noteId) {
 // Export the action creators and reducer
 module.exports = reducer;
 
-},{"../helpers/api":12,"lodash":"lodash"}]},{},[1])
+},{"../helpers/api":13,"lodash":"lodash"}]},{},[1])
 
 //# sourceMappingURL=/assets/js/app.js.map

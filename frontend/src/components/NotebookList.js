@@ -1,10 +1,11 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-
+const _ = require('lodash');
 const createActionDispatchers = require('../helpers/createActionDispatchers');
 const notebooksActionCreators = require('../reducers/notebooks');
 const NotebookNew = require('./NotebookNew');
 const NoteNew = require('./NoteNew');
+const Search = require('./Search');
 
 /*
   *** TODO: Build more functionality into the NotebookList component ***
@@ -15,11 +16,20 @@ const NoteNew = require('./NoteNew');
 
 
 class ActiveNotebook extends React.Component {
-constructor(props) {
-    super(props);
+
+  constructor(props) {
+
+      super(props);
+      alert(this.props.notes);
+      this.state={
+            phrase:'',
+            tempNotes:this.props.notes,
+      };
 
   }
+
   render() {
+
     const createNote = (note) => {
       if(note.id === this.props.activeNoteId) {
         return <ActiveNote key={note.id} title={note.title} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote} content={note.content}/>;
@@ -31,14 +41,68 @@ constructor(props) {
     const onClickNotebook = (event) => {
       event.preventDefault();
       this.props.loadNotes(this.props.notebook.id);
-      //should i make another call to a method that can solve this problem?
-      //a method that can change the state.. call to the reducer
     };
 
     const onDeleteNotebookButtonClick = (event) => {
       this.props.deleteNotebook(this.props.notebook.id);
     };
-      //made a button bigger when active
+
+    const clearInput = () => {
+      this.setState({
+        phrase:''
+      });
+    };
+
+    const onSearching = (event) => {
+		//The setState is somehow not updating hte phrase/
+		//alert(event.target.value);//This is showing some values
+		const phrase = event.target.value;
+
+		this.setState({phrase});
+    //resetSearchbar();
+		//onSearch(this.state.phrase);
+
+    //
+		onSearch(phrase);
+		//right now we can make seargch as you type we can implement a button too
+    };
+
+    const onSearch = (phrase) => {
+
+        const tempNotes=[];
+        this.setState({tempNotes});
+
+        this.props.notes.map(note => {
+
+
+          if(note.title.contains(phrase))
+          {
+            tempNotes.push(note);
+          }
+          else if(
+
+              ((note.title.search(phrase)) === (-1))
+
+              &&
+
+              ((note.content.search(phrase)) === (-1))
+
+          )
+          {  }
+          else
+          {
+              tempNotes.push(note);
+          }
+          //we first need notes in its state
+          //this will create anoter notes, array of note (IDs of whom to display)
+        })
+        //It will return an array of notes
+        //And instead of directly mapping from notes state to create notes, we use this array to map notes
+        this.setState({tempNotes});
+        console.table(tempNotes);
+
+   }
+
     return (
       <li className="UnorderedListChildNB">
 
@@ -50,14 +114,44 @@ constructor(props) {
           <i className="fa fa-remove"></i>
         </button>
 
-        <div className="Notes">
-        <h3>Notes
-        <NoteNew createNote ={this.props.createNote} notebookId={this.props.activeNotebookId}/>
-        </h3>
-        <ol>
-          {this.props.notes.map(createNote)}
-        </ol>
+        <div>
+          <div className="input-group">
+
+              <input
+                className="form-control input-lg"
+                value={this.state.phrase}
+                placeholder="Search...."
+                onChange={onSearching}
+
+              />
+
+              <div className="input-group-btn">
+
+                  <button
+                    className="btn btn-warning btn-lg"
+                    style={{marginRight: '12px'}}
+                    onClick={clearInput}
+                  >
+                  <i className="fa fa-eraser"></i>
+                  </button>
+
+              </div>
+
         </div>
+
+        <div className="Notes">
+
+                  <h3>Notes
+                  <NoteNew createNote ={createNote} notebookId={this.props.activeNotebookId}/>
+                  </h3>
+
+                  <ol>
+                    {this.state.tempNotes.map(createNote)}
+                  </ol>
+
+        </div>
+
+  </div>
 
       </li>
     );
@@ -168,6 +262,7 @@ class NotebookList extends React.Component {
     super(props);
     this.state = {};
   }
+
   render() {
     const createNotebookListItem = (notebook) => {
 

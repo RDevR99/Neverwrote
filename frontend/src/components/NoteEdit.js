@@ -27,12 +27,14 @@ class NoteEdit extends React.Component {
         content: this.state.content,
         notebookId: this.props.notebookId
       });
+
       this.props.onSave(editedPost);
       this.props.onCancel();
     };
 
     const onTitleChange = (event) => {
       this.setState({title: event.target.value});
+
     };
 
     const onContentChange = (event) => {

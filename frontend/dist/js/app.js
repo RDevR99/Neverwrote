@@ -263,6 +263,7 @@ var NoteEdit = function (_React$Component) {
           content: _this2.state.content,
           notebookId: _this2.props.notebookId
         });
+
         _this2.props.onSave(editedPost);
         _this2.props.onCancel();
       };
@@ -522,6 +523,7 @@ var ActiveNotebook = function (_React$Component) {
       var _this2 = this;
 
       var createNote = function createNote(note) {
+        console.log(note);
         if (note.id === _this2.props.activeNoteId) {
           return React.createElement(ActiveNote, { key: note.id, title: note.title, note: note, loadNoteContent: _this2.props.loadNoteContent, deleteNote: _this2.props.deleteNote, content: note.content });
         }
@@ -542,6 +544,7 @@ var ActiveNotebook = function (_React$Component) {
         _this2.setState({
           phrase: ''
         });
+        onSearch('');
       };
 
       var onSearching = function onSearching(event) {
@@ -565,11 +568,10 @@ var ActiveNotebook = function (_React$Component) {
 
         _this2.props.notes.map(function (note) {
 
-          if (note.title.contains(phrase)) {
-            tempNotes.push(note);
-          } else if (note.title.search(phrase) === -1 && note.content.search(phrase) === -1) {} else {
+          if (note.title.contains(phrase) || phrase === '') {
             tempNotes.push(note);
           }
+
           //we first need notes in its state
           //this will create anoter notes, array of note (IDs of whom to display)
         });
@@ -752,7 +754,7 @@ var Notebook = function (_React$Component4) {
       };
 
       var onDeleteNotebookButtonClick = function onDeleteNotebookButtonClick(event) {
-        _this8.props.deleteNotebook(_this8.props.notebook.id);
+        _this8.props.deleteNotebook(_this8.props.notebook.id);alert(_this8.props.notes);
       };
 
       return React.createElement(

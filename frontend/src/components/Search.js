@@ -8,13 +8,8 @@ class Search extends React.Component{
 
     super(props);
 
-    //const createNote = props.createNote;
-    //const activeNotebookId = props.activeNotebookId;
-    //const notes = props.notes;
-
     this.state = {
         phrase:'',
-        tempNotes:[],
     };
   }
 
@@ -27,20 +22,16 @@ class Search extends React.Component{
     };
 
     const onSearching = (event) => {
-		//The setState is somehow not updating hte phrase/
-		//alert(event.target.value);//This is showing some values
-		const phrase = event.target.value;
 
-		this.setState({phrase});
-    //resetSearchbar();
-		//onSearch(this.state.phrase);
+      const phrase = event.target.value;
 
-    //
-		onSearch(phrase);
-		//right now we can make seargch as you type we can implement a button too
+      this.setState({phrase});
+
+      //onSearch(phrase);
+
     };
 
-    const onSearch = (phrase) => {
+    /*const onSearch = (phrase) => {
 
         const tempNotes=[];
         console.log(this.props.notes);
@@ -74,7 +65,7 @@ class Search extends React.Component{
         this.setState({tempNotes});
         console.table(tempNotes);
 
-   }
+   }*/
 
 
 
@@ -101,18 +92,6 @@ class Search extends React.Component{
                   </button>
 
               </div>
-
-        </div>
-
-        <div className="Notes">
-
-                  <h3>Notes
-                  <NoteNew createNote ={this.props.createNote} notebookId={this.props.activeNotebookId}/>
-                  </h3>
-
-                  <ol>
-                    {this.state.tempNotes.map(this.props.createNote)}
-                  </ol>
 
         </div>
 

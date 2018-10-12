@@ -29,6 +29,7 @@ class ActiveNotebook extends React.Component {
   render() {
 
     const createNote = (note) => {
+      console.log(note)
       if(note.id === this.props.activeNoteId) {
         return <ActiveNote key={note.id} title={note.title} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote} content={note.content}/>;
       }
@@ -49,6 +50,7 @@ class ActiveNotebook extends React.Component {
       this.setState({
         phrase:''
       });
+      onSearch('');
     };
 
     const onSearching = (event) => {
@@ -73,24 +75,11 @@ class ActiveNotebook extends React.Component {
         this.props.notes.map(note => {
 
 
-          if(note.title.contains(phrase))
+          if(note.title.contains(phrase) || phrase ==='')
           {
             tempNotes.push(note);
           }
-          else if(
 
-              ((note.title.search(phrase)) === (-1))
-
-              &&
-
-              ((note.content.search(phrase)) === (-1))
-
-          )
-          {  }
-          else
-          {
-              tempNotes.push(note);
-          }
           //we first need notes in its state
           //this will create anoter notes, array of note (IDs of whom to display)
         })
@@ -233,7 +222,7 @@ constructor(props) {
     };
 
     const onDeleteNotebookButtonClick = (event) => {
-      this.props.deleteNotebook(this.props.notebook.id);
+      this.props.deleteNotebook(this.props.notebook.id);   alert(this.props.notes);
     };
 
     return (

@@ -5,7 +5,6 @@ const createActionDispatchers = require('../helpers/createActionDispatchers');
 const notebooksActionCreators = require('../reducers/notebooks');
 const NotebookNew = require('./NotebookNew');
 const NoteNew = require('./NoteNew');
-const Search = require('./Search');
 
 /*
   *** TODO: Build more functionality into the NotebookList component ***
@@ -20,7 +19,6 @@ class ActiveNotebook extends React.Component {
   constructor(props) {
 
       super(props);
-      alert(this.props.notes);
       this.state={
             phrase:'',
             tempNotes:this.props.notes,

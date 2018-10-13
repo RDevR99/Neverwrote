@@ -6,12 +6,6 @@ const notebooksActionCreators = require('../reducers/notebooks');
 const NotebookNew = require('./NotebookNew');
 const NoteNew = require('./NoteNew');
 
-/*
-  *** TODO: Build more functionality into the NotebookList component ***
-  At the moment, the NotebookList component simply renders the notebooks
-  as a plain list containing their titles. This code is just a starting point,
-  you will need to build upon it in order to complete the assignment.
-*/
 
 
 class ActiveNotebook extends React.Component {
@@ -19,9 +13,12 @@ class ActiveNotebook extends React.Component {
   constructor(props) {
 
       super(props);
+
       this.state={
-            phrase:'',
-            tempNotes:this.props.notes,
+
+        phrase: '',
+        tempNotes:'',
+
       };
 
   }
@@ -29,12 +26,12 @@ class ActiveNotebook extends React.Component {
   render() {
 
     const createNote = (note) => {
-      console.log(note)
-      if(note.id === this.props.activeNoteId) {
-        return <ActiveNote key={note.id} title={note.title} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote} content={note.content}/>;
-      }
 
-      return <Note key={note.id} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote}/>;
+        if(note.id === this.props.activeNoteId) {
+          return <ActiveNote key={note.id} title={note.title} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote} content={note.content}/>;
+        }
+        return <Note key={note.id} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote}/>;
+
     }
 
     const onClickNotebook = (event) => {
@@ -47,24 +44,21 @@ class ActiveNotebook extends React.Component {
     };
 
     const clearInput = () => {
+      console.log('I have been called!');
+      console.table(this.props.notes);
       this.setState({
-        phrase:''
+        phrase:'',
+        tempNotes: '',
       });
       onSearch('');
     };
 
     const onSearching = (event) => {
-		//The setState is somehow not updating hte phrase/
-		//alert(event.target.value);//This is showing some values
-		const phrase = event.target.value;
 
-		this.setState({phrase});
-    //resetSearchbar();
-		//onSearch(this.state.phrase);
+          const phrase = event.target.value;
+          this.setState({phrase});
+          onSearch(phrase);
 
-    //
-		onSearch(phrase);
-		//right now we can make seargch as you type we can implement a button too
     };
 
     const onSearch = (phrase) => {
@@ -75,18 +69,14 @@ class ActiveNotebook extends React.Component {
         this.props.notes.map(note => {
 
 
-          if(note.title.contains(phrase) || phrase ==='')
+          if(!(note.title.contains(phrase) || phrase ===''))
           {
             tempNotes.push(note);
           }
 
-          //we first need notes in its state
-          //this will create anoter notes, array of note (IDs of whom to display)
         })
-        //It will return an array of notes
-        //And instead of directly mapping from notes state to create notes, we use this array to map notes
+
         this.setState({tempNotes});
-        console.table(tempNotes);
 
    }
 
@@ -129,11 +119,11 @@ class ActiveNotebook extends React.Component {
         <div className="Notes">
 
                   <h3>Notes
-                  <NoteNew createNote ={createNote} notebookId={this.props.activeNotebookId}/>
+                  <NoteNew clearInput={clearInput} createNote ={this.props.createNote} notebookId={this.props.activeNotebookId}/>
                   </h3>
 
                   <ol>
-                    {this.state.tempNotes.map(createNote)}
+                    { _.difference(this.props.notes,this.state.tempNotes).map(note => createNote(note))}
                   </ol>
 
         </div>
@@ -222,7 +212,7 @@ constructor(props) {
     };
 
     const onDeleteNotebookButtonClick = (event) => {
-      this.props.deleteNotebook(this.props.notebook.id);   alert(this.props.notes);
+      this.props.deleteNotebook(this.props.notebook.id);
     };
 
     return (

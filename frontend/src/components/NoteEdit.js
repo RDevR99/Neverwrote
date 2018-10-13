@@ -28,6 +28,8 @@ class NoteEdit extends React.Component {
         notebookId: this.props.notebookId
       });
 
+      console.log('edited post');
+      console.table(editedPost);
       this.props.onSave(editedPost);
       this.props.onCancel();
     };

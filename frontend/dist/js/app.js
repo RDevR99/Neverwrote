@@ -264,6 +264,8 @@ var NoteEdit = function (_React$Component) {
           notebookId: _this2.props.notebookId
         });
 
+        console.log('edited post');
+        console.table(editedPost);
         _this2.props.onSave(editedPost);
         _this2.props.onCancel();
       };
@@ -334,7 +336,10 @@ var NoteNew = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (NoteNew.__proto__ || Object.getPrototypeOf(NoteNew)).call(this, props));
 
-    _this.state = { editing: false };
+    _this.state = {
+      editing: false
+
+    };
     return _this;
   }
 
@@ -349,12 +354,15 @@ var NoteNew = function (_React$Component) {
 
       var closeEdit = function closeEdit() {
         _this2.setState({ editing: false });
+        console.log('Calling...');
+        _this2.props.clearInput();
       };
 
       var createNote = function createNote(newNote) {
         _this2.props.createNote(newNote, function (err) {
           if (!err) closeEdit();
         });
+        console.log('this is supposed to show up after the first table');
       };
 
       if (this.state.editing) {
@@ -494,13 +502,6 @@ var notebooksActionCreators = require('../reducers/notebooks');
 var NotebookNew = require('./NotebookNew');
 var NoteNew = require('./NoteNew');
 
-/*
-  *** TODO: Build more functionality into the NotebookList component ***
-  At the moment, the NotebookList component simply renders the notebooks
-  as a plain list containing their titles. This code is just a starting point,
-  you will need to build upon it in order to complete the assignment.
-*/
-
 var ActiveNotebook = function (_React$Component) {
   _inherits(ActiveNotebook, _React$Component);
 
@@ -510,8 +511,10 @@ var ActiveNotebook = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (ActiveNotebook.__proto__ || Object.getPrototypeOf(ActiveNotebook)).call(this, props));
 
     _this.state = {
+
       phrase: '',
-      tempNotes: _this.props.notes
+      tempNotes: ''
+
     };
 
     return _this;
@@ -523,11 +526,10 @@ var ActiveNotebook = function (_React$Component) {
       var _this2 = this;
 
       var createNote = function createNote(note) {
-        console.log(note);
+
         if (note.id === _this2.props.activeNoteId) {
           return React.createElement(ActiveNote, { key: note.id, title: note.title, note: note, loadNoteContent: _this2.props.loadNoteContent, deleteNote: _this2.props.deleteNote, content: note.content });
         }
-
         return React.createElement(Note, { key: note.id, note: note, loadNoteContent: _this2.props.loadNoteContent, deleteNote: _this2.props.deleteNote });
       };
 
@@ -541,24 +543,20 @@ var ActiveNotebook = function (_React$Component) {
       };
 
       var clearInput = function clearInput() {
+        console.log('I have been called!');
+        console.table(_this2.props.notes);
         _this2.setState({
-          phrase: ''
+          phrase: '',
+          tempNotes: ''
         });
         onSearch('');
       };
 
       var onSearching = function onSearching(event) {
-        //The setState is somehow not updating hte phrase/
-        //alert(event.target.value);//This is showing some values
+
         var phrase = event.target.value;
-
         _this2.setState({ phrase: phrase });
-        //resetSearchbar();
-        //onSearch(this.state.phrase);
-
-        //
         onSearch(phrase);
-        //right now we can make seargch as you type we can implement a button too
       };
 
       var onSearch = function onSearch(phrase) {
@@ -568,17 +566,12 @@ var ActiveNotebook = function (_React$Component) {
 
         _this2.props.notes.map(function (note) {
 
-          if (note.title.contains(phrase) || phrase === '') {
+          if (!(note.title.contains(phrase) || phrase === '')) {
             tempNotes.push(note);
           }
-
-          //we first need notes in its state
-          //this will create anoter notes, array of note (IDs of whom to display)
         });
-        //It will return an array of notes
-        //And instead of directly mapping from notes state to create notes, we use this array to map notes
+
         _this2.setState({ tempNotes: tempNotes });
-        console.table(tempNotes);
       };
 
       return React.createElement(
@@ -628,12 +621,14 @@ var ActiveNotebook = function (_React$Component) {
               'h3',
               null,
               'Notes',
-              React.createElement(NoteNew, { createNote: createNote, notebookId: this.props.activeNotebookId })
+              React.createElement(NoteNew, { clearInput: clearInput, createNote: this.props.createNote, notebookId: this.props.activeNotebookId })
             ),
             React.createElement(
               'ol',
               null,
-              this.state.tempNotes.map(createNote)
+              _.difference(this.props.notes, this.state.tempNotes).map(function (note) {
+                return createNote(note);
+              })
             )
           )
         )
@@ -754,7 +749,7 @@ var Notebook = function (_React$Component4) {
       };
 
       var onDeleteNotebookButtonClick = function onDeleteNotebookButtonClick(event) {
-        _this8.props.deleteNotebook(_this8.props.notebook.id);alert(_this8.props.notes);
+        _this8.props.deleteNotebook(_this8.props.notebook.id);
       };
 
       return React.createElement(

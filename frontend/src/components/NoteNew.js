@@ -5,7 +5,10 @@ const NoteEdit = require('./NoteEdit');
 class NoteNew extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {editing:false};
+    this.state = {
+      editing:false,
+
+    };
   }
 
   render() {
@@ -15,12 +18,16 @@ class NoteNew extends React.Component {
 
     const closeEdit = () => {
       this.setState({editing:false});
+      console.log('Calling...');
+      this.props.clearInput();
+
     }
 
     const createNote = (newNote) => {
       this.props.createNote(newNote, (err) => {
         if(!err) closeEdit();
-      });
+      })
+      console.log('this is supposed to show up after the first table');
     };
 
     if(this.state.editing) {

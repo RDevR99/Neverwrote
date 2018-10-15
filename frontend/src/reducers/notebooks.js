@@ -166,6 +166,11 @@ reducer.deleteNotebook = (notebookId) => {
   }
 }
 
+/*
+ * This is the createNote action dispatcher, which makes a post call to the api, for notebooks
+ * passing newNotebook in the body, and after it being successful we dispatch a CREATE action which
+ * makes corresponding changes to the state and we could see a new notebook
+ */
 reducer.createNotebook = (newNotebook, callback) => {
   return(dispatch) => {
     api.post('/notebooks', newNotebook).then((notebook) => {
@@ -174,6 +179,10 @@ reducer.createNotebook = (newNotebook, callback) => {
   }
 }
 
+/* This is the createNote action dispatcher which makes a api post call for the notes
+ * and pass notes in the body of the request. It being done, we dispatch a CREATEN (create note) action
+ * which makes the corresponding changes to the state. This will allow us to see the new note on our page
+ */
 reducer.createNote = (newNote, callback) => {
   return(dispatch) => {
     api.post('/notes',newNote).then((note) => {
@@ -182,6 +191,9 @@ reducer.createNote = (newNote, callback) => {
   }
 }
 
+//This is the deleteNote action dispatcher which gives an api delete call for the notes, where we pasd noteId as a parameter
+//This being done, it dispatched a DELETEN (delete note) action which deletes the note from the state causing a re-render
+//And the note is deleted.
 reducer.deleteNote  =(noteId) => {
   return(dispatch) => {
     api.delete('/notes/'+noteId).then((note) => {
@@ -190,7 +202,7 @@ reducer.deleteNote  =(noteId) => {
   }
 }
 
-
+//This is the onSearchNote
 reducer.onSearchNotes = (phrase) => {
   return(dispatch) => {
     api.get('/search/notes/'+phrase).then((notes) =>{

@@ -1,8 +1,7 @@
 const _ = require('lodash');
 const api = require('../helpers/api');
 
-// Action type constants
-/* *** TODO: Put action constants here *** */
+//Following are all the action constants that I have used.
 const UPDATE = 'myapp/UPDATE';
 const CREATE = 'myapp/CREATE';
 const DELETE = 'myapp/DELETE';

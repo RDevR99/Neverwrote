@@ -45,7 +45,7 @@ class NoteEdit extends React.Component {
     };
 	
     
-    //This function is called when we change something in the input of the title area of the markDownEditor that we are using to enter data for the new note and press the green tick button.
+    //This function is called when we change something in the input of the title area for the new note and press the green tick button.
     const onTitleChange = (event) => {
       //We set the state to the title of the newly entered title.
       this.setState({title: event.target.value});
@@ -59,7 +59,7 @@ class NoteEdit extends React.Component {
     };
     
     
-
+	//We return a form
     return(
       <form className="blog-post">
 

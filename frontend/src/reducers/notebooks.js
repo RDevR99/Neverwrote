@@ -2,16 +2,20 @@ const _ = require('lodash');
 const api = require('../helpers/api');
 
 //Following are all the action constants that I have used.
-const UPDATE = 'myapp/UPDATE';
-const CREATE = 'myapp/CREATE';
-const DELETE = 'myapp/DELETE';
-const SHOW = 'myapp/SHOW';
-const DELETEN = 'myapp/DELETEN';
-const CREATEN = 'myapp/CREATEn';
-const SEARCHED = 'myapp/SEARCHED';
-const RESETNOTE = 'myapp/RESETNOTE';
-const RESETNOTEBOOK ='myapp/RESETNOTEBOOK';
+const UPDATE = 'myapp/UPDATE'; //Update Notebook to an Active Notebook
+const CREATE = 'myapp/CREATE'; //Create Notebook
+const DELETE = 'myapp/DELETE'; //Delete Notebook
+const SHOW = 'myapp/SHOW'; //Show note's content
+const DELETEN = 'myapp/DELETEN';//Delete Note
+const CREATEN = 'myapp/CREATEn';//Create Note
+const SEARCHED = 'myapp/SEARCHED';	//Search the notes
+const RESETNOTE = 'myapp/RESETNOTE';	//Reset an active note to a normal note.
+const RESETNOTEBOOK ='myapp/RESETNOTEBOOK'; //Reset an active notebook to a normal notebook.
 
+//we set the initial state with some hard-coded data
+//Active notebookId and noteId are set to -1 so that none of the notes and notebooks are active.
+//notes[] store the notes that are supposed to be displayed in an active notebook
+//Searched notes store all the notes that we are have searched.
 const initialState = {
   notebooks: [
     { id: 100, title: 'From Redux Store: A hard-coded notebook' },
@@ -30,45 +34,66 @@ function reducer(state, action) {
   action = action || {};
 
   switch(action.type) {
-    /* *** TODO: Put per-action code here *** */
+    //We placed the per action code in here
+    //We assign an active notebookId passed as an action to us and notes too
+    //This is the backbone behind an active notebook and the list of notes
     case UPDATE: {
       return Object.assign({}, state, { activeNotebookId:action.notebookId,
       notes: action.notes, activeNoteId: -1});
     }
 
+    //Reset note to an active note back to a normal note
     case RESETNOTE: {
       return Object.assign({}, state, { activeNoteId: -1});
     }
-
+	
+    //Reset an active notebook back to a normal notebook.
     case RESETNOTEBOOK:{
        return Object.assign({}, state, { activeNotebookId:-1});
     }
-
+	
+    //We create a notebook by adding a notebook to our collection of notebooks and store it into a constant
     case CREATE: {
       const unsortedNotebooks = _.concat(state.notebooks,action.notebook);
-
+	  //notebooks are sorted in descending order based on their creation date and placed into another constant
       const notebooks = _.orderBy(unsortedNotebooks, 'createdAt', 'desc');
-
+	  //We return a new state with our updated notebooks
       return _.assign({}, state, {notebooks});
     }
+      
+    //We first create a clone of our current state.
+    //now we set the notebooks in the new constant with a copy of it, just rejecting the notebookId that is supposed to be deleted
     case DELETE: {
       const newState = _.clone(state);
       newState.notebooks = _.reject(state.notebooks, {id:action.notebookId});
+      //We return the new state.
       return newState;
     }
+      
+    //We show the note's content using this action
+    //active note Id is made the one which is clicked and is supposed to show it's content
     case SHOW:{
       return Object.assign({}, state, {activeNoteId:action.noteId});
     }
+      
+    //This is the delete note stuff
+    //we assin the new state with notes, rejecting the one which carries an Id of deleted note
+    //We return the new state after this modification
     case DELETEN:{
         const newState = _.clone(state)
         newState.notes = _.reject(state.notes,{id:action.noteId});
         return newState;
     }
+      
+    //We create a note by adding them to our list as per the action note.
+    //we then sort the notes.
     case CREATEN: {
       const unsortedNotes = _.concat(state.notes, action.note);
       const notes = _.orderBy(unsortedNotes,'createdAt','desc');
       return _.assign({},state,{notes});
     }
+      
+    //We put the notes from the action
     case SEARCHED: {
       const searchedNotes = action.notes;
       const notebooks = action.tempNotebooks;

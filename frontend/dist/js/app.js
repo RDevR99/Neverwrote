@@ -528,14 +528,14 @@ var ActiveNotebook = function (_React$Component) {
       var createNote = function createNote(note) {
 
         if (note.id === _this2.props.activeNoteId) {
-          return React.createElement(ActiveNote, { key: note.id, title: note.title, note: note, loadNoteContent: _this2.props.loadNoteContent, deleteNote: _this2.props.deleteNote, content: note.content });
+          return React.createElement(ActiveNote, { key: note.id, title: note.title, note: note, resetNote: _this2.props.resetNote, deleteNote: _this2.props.deleteNote, content: note.content });
         }
         return React.createElement(Note, { key: note.id, note: note, loadNoteContent: _this2.props.loadNoteContent, deleteNote: _this2.props.deleteNote });
       };
 
       var onClickNotebook = function onClickNotebook(event) {
         event.preventDefault();
-        _this2.props.loadNotes(_this2.props.notebook.id);
+        _this2.props.resetNotebook();
       };
 
       var onDeleteNotebookButtonClick = function onDeleteNotebookButtonClick(event) {
@@ -543,8 +543,7 @@ var ActiveNotebook = function (_React$Component) {
       };
 
       var clearInput = function clearInput() {
-        console.log('I have been called!');
-        console.table(_this2.props.notes);
+
         _this2.setState({
           phrase: '',
           tempNotes: ''
@@ -566,7 +565,7 @@ var ActiveNotebook = function (_React$Component) {
 
         _this2.props.notes.map(function (note) {
 
-          if (!(note.title.contains(phrase) || phrase === '')) {
+          if (!(note.title.contains(phrase) || note.content.contains(phrase) || phrase === '')) {
             tempNotes.push(note);
           }
         });
@@ -655,7 +654,7 @@ var ActiveNote = function (_React$Component2) {
 
       var onClickNote = function onClickNote(event) {
         event.preventDefault();
-        _this4.props.loadNoteContent(_this4.props.note.id);
+        _this4.props.resetNote();
       };
 
       var onDeleteNoteButtonClick = function onDeleteNoteButtonClick(event) {
@@ -774,50 +773,157 @@ var Notebook = function (_React$Component4) {
   return Notebook;
 }(React.Component);
 
-var NotebookList = function (_React$Component5) {
-  _inherits(NotebookList, _React$Component5);
+var SearchedNote = function (_React$Component5) {
+  _inherits(SearchedNote, _React$Component5);
+
+  function SearchedNote(props) {
+    _classCallCheck(this, SearchedNote);
+
+    return _possibleConstructorReturn(this, (SearchedNote.__proto__ || Object.getPrototypeOf(SearchedNote)).call(this, props));
+  }
+
+  _createClass(SearchedNote, [{
+    key: 'render',
+    value: function render() {
+
+      return React.createElement(
+        'li',
+        { className: 'UnorderedListChildN' },
+        this.props.note.title,
+        '   :   ',
+        this.props.note.content
+      );
+    }
+  }]);
+
+  return SearchedNote;
+}(React.Component);
+
+var NotebookList = function (_React$Component6) {
+  _inherits(NotebookList, _React$Component6);
 
   function NotebookList(props) {
     _classCallCheck(this, NotebookList);
 
-    var _this9 = _possibleConstructorReturn(this, (NotebookList.__proto__ || Object.getPrototypeOf(NotebookList)).call(this, props));
+    var _this10 = _possibleConstructorReturn(this, (NotebookList.__proto__ || Object.getPrototypeOf(NotebookList)).call(this, props));
 
-    _this9.state = {};
-    return _this9;
+    _this10.state = {
+      phrase: ''
+    };
+    return _this10;
   }
 
   _createClass(NotebookList, [{
     key: 'render',
     value: function render() {
-      var _this10 = this;
+      var _this11 = this;
 
       var createNotebookListItem = function createNotebookListItem(notebook) {
 
-        if (notebook.id === _this10.props.notebooks.activeNotebookId) {
+        if (notebook.id === _this11.props.notebooks.activeNotebookId) {
           return React.createElement(ActiveNotebook, {
             key: notebook.id,
             notebook: notebook,
-            deleteNotebook: _this10.props.deleteNotebook,
-            notes: _this10.props.notebooks.notes,
-            loadNotes: _this10.props.loadNotes,
-            loadNoteContent: _this10.props.loadNoteContent,
-            activeNoteId: _this10.props.notebooks.activeNoteId,
-            deleteNote: _this10.props.deleteNote,
-            createNote: _this10.props.createNote,
-            activeNotebookId: _this10.props.notebooks.activeNotebookId
+            deleteNotebook: _this11.props.deleteNotebook,
+            notes: _this11.props.notebooks.notes,
+            loadNotes: _this11.props.loadNotes,
+            loadNoteContent: _this11.props.loadNoteContent,
+            activeNoteId: _this11.props.notebooks.activeNoteId,
+            deleteNote: _this11.props.deleteNote,
+            createNote: _this11.props.createNote,
+            activeNotebookId: _this11.props.notebooks.activeNotebookId,
+            resetNote: _this11.props.resetNote,
+            resetNotebook: _this11.props.resetNotebook
           });
         }
         return React.createElement(Notebook, {
           key: notebook.id,
           notebook: notebook,
-          loadNotes: _this10.props.loadNotes,
-          deleteNotebook: _this10.props.deleteNotebook
+          loadNotes: _this11.props.loadNotes,
+          deleteNotebook: _this11.props.deleteNotebook
         });
+      };
+
+      var onSearching = function onSearching(event) {
+
+        var phrase = event.target.value;
+        _this11.setState({ phrase: phrase });
+        onSearch(phrase);
+      };
+
+      var onSearch = function onSearch(phrase) {
+        if (!(phrase === '')) {
+          _this11.props.onSearchNotes(phrase);
+        }
+      };
+
+      var clearInput = function clearInput() {
+
+        _this11.setState({
+          phrase: ''
+        });
+
+        onSearch('  24pytg38vhtu  iohfWCsdvSDV SJKC j njvsdjalvnv;jv;nasv0E GH4[IOGAGIOHfu');
+      };
+
+      var createNote = function createNote() {
+        return _this11.props.notebooks.searchedNotes.map(function (note) {
+
+          return React.createElement(SearchedNote, { key: note.id, note: note });
+        });
+      };
+
+      var loadSearchedNotes = function loadSearchedNotes() {
+
+        console.log('table:');
+        console.table(_this11.props.notebooks.searchedNotes);
+
+        if (_this11.state.phrase === "") {} else {
+          return React.createElement(
+            'ol',
+            null,
+            createNote()
+          );
+        }
       };
 
       return React.createElement(
         'div',
         null,
+        React.createElement(
+          'div',
+          { className: 'input-group' },
+          React.createElement('input', {
+            className: 'form-control input-lg',
+            value: this.state.phrase,
+            placeholder: 'Search....',
+            onChange: onSearching
+
+          }),
+          React.createElement(
+            'div',
+            { className: 'input-group-btn' },
+            React.createElement(
+              'button',
+              {
+                className: 'btn btn-warning btn-lg',
+                style: { marginRight: '12px' },
+                onClick: clearInput
+              },
+              React.createElement('i', { className: 'fa fa-eraser' })
+            )
+          )
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'p',
+            null,
+            'Search Results'
+          ),
+          loadSearchedNotes()
+        ),
         React.createElement(
           'h2',
           null,
@@ -841,9 +947,9 @@ var NotebookList = function (_React$Component5) {
 var NotebookListContainer = ReactRedux.connect(function (state) {
   return {
     notebooks: state.notebooks,
-    //activeNotebookId: state.activeNotebookId,
     notes: state.notes,
-    activeNoteId: state.activeNoteId
+    activeNoteId: state.activeNoteId,
+    searchedNotes: state.searchedNotes
   };
 }, createActionDispatchers(notebooksActionCreators))(NotebookList);
 
@@ -1173,12 +1279,16 @@ var DELETE = 'myapp/DELETE';
 var SHOW = 'myapp/SHOW';
 var DELETEN = 'myapp/DELETEN';
 var CREATEN = 'myapp/CREATEn';
+var SEARCHED = 'myapp/SEARCHED';
+var RESETNOTE = 'myapp/RESETNOTE';
+var RESETNOTEBOOK = 'myapp/RESETNOTEBOOK';
 
 var initialState = {
   notebooks: [{ id: 100, title: 'From Redux Store: A hard-coded notebook' }, { id: 101, title: 'From Redux Store: Another hard-coded notebook' }],
   activeNotebookId: -1,
   notes: [],
-  activeNoteId: -1 //Added new Line for note
+  activeNoteId: -1, //Added new Line for note
+  searchedNotes: []
 };
 
 // Function which takes the current data state and an action,
@@ -1194,6 +1304,17 @@ function reducer(state, action) {
         return Object.assign({}, state, { activeNotebookId: action.notebookId,
           notes: action.notes, activeNoteId: -1 });
       }
+
+    case RESETNOTE:
+      {
+        return Object.assign({}, state, { activeNoteId: -1 });
+      }
+
+    case RESETNOTEBOOK:
+      {
+        return Object.assign({}, state, { activeNotebookId: -1 });
+      }
+
     case CREATE:
       {
         var unsortedNotebooks = _.concat(state.notebooks, action.notebook);
@@ -1224,6 +1345,12 @@ function reducer(state, action) {
         var notes = _.orderBy(unsortedNotes, 'createdAt', 'desc');
         return _.assign({}, state, { notes: notes });
       }
+    case SEARCHED:
+      {
+        var searchedNotes = action.notes;
+        var _notebooks = action.tempNotebooks;
+        return _.assign({}, state, { searchedNotes: searchedNotes });
+      }
     default:
       return state;
   }
@@ -1244,6 +1371,19 @@ reducer.loadNoteContent = function (noteId) {
     api.get('/notes/' + noteId).then(function (note) {
       dispatch({ type: SHOW, noteId: noteId });
     });
+  };
+};
+
+reducer.resetNote = function () {
+  return function (dispatch) {
+    dispatch({ type: RESETNOTE });
+  };
+};
+
+reducer.resetNotebook = function () {
+  return function (dispatch) {
+    console.log('calling reset');
+    dispatch({ type: RESETNOTEBOOK });
   };
 };
 
@@ -1275,6 +1415,23 @@ reducer.deleteNote = function (noteId) {
   return function (dispatch) {
     api.delete('/notes/' + noteId).then(function (note) {
       dispatch({ type: DELETEN, noteId: noteId });
+    });
+  };
+};
+
+reducer.onSearchNotes = function (phrase) {
+  return function (dispatch) {
+    api.get('/search/notes/' + phrase).then(function (notes) {
+
+      var tempNotebooks = [];
+
+      notes.map(function (note) {
+        api.get('/notebooks/' + note.notebookId).then(function (notebook) {
+          tempNotebooks.push(notebook);
+        });
+        console.log(tempNotebooks);
+      });
+      dispatch({ type: SEARCHED, tempNotebooks: tempNotebooks, notes: notes });
     });
   };
 };

@@ -9,6 +9,9 @@ const DELETE = 'myapp/DELETE';
 const SHOW = 'myapp/SHOW';
 const DELETEN = 'myapp/DELETEN';
 const CREATEN = 'myapp/CREATEn';
+const SEARCHED = 'myapp/SEARCHED';
+const RESETNOTE = 'myapp/RESETNOTE';
+const RESETNOTEBOOK ='myapp/RESETNOTEBOOK';
 
 const initialState = {
   notebooks: [
@@ -18,6 +21,7 @@ const initialState = {
   activeNotebookId: -1,
   notes:[],
   activeNoteId: -1, //Added new Line for note
+  searchedNotes:[],
 };
 
 // Function which takes the current data state and an action,
@@ -32,6 +36,15 @@ function reducer(state, action) {
       return Object.assign({}, state, { activeNotebookId:action.notebookId,
       notes: action.notes, activeNoteId: -1});
     }
+
+    case RESETNOTE: {
+      return Object.assign({}, state, { activeNoteId: -1});
+    }
+
+    case RESETNOTEBOOK:{
+       return Object.assign({}, state, { activeNotebookId:-1});
+    }
+
     case CREATE: {
       const unsortedNotebooks = _.concat(state.notebooks,action.notebook);
 
@@ -57,6 +70,11 @@ function reducer(state, action) {
       const notes = _.orderBy(unsortedNotes,'createdAt','desc');
       return _.assign({},state,{notes});
     }
+    case SEARCHED: {
+      const searchedNotes = action.notes;
+      const notebooks = action.tempNotebooks;
+      return _.assign({},state,{searchedNotes});
+    }
     default: return state;
   }
 }
@@ -76,6 +94,19 @@ reducer.loadNoteContent = (noteId) => {
     api.get('/notes/'+noteId).then((note) => {
       dispatch({type:SHOW, noteId})
     })
+  }
+}
+
+reducer.resetNote = () => {
+  return(dispatch) => {
+    dispatch({type:RESETNOTE})
+  }
+}
+
+reducer.resetNotebook = () => {
+  return(dispatch) => {
+    console.log('calling reset');
+    dispatch({type:RESETNOTEBOOK})
   }
 }
 
@@ -110,6 +141,27 @@ reducer.deleteNote  =(noteId) => {
     })
   }
 }
+
+
+reducer.onSearchNotes = (phrase) => {
+  return(dispatch) => {
+    api.get('/search/notes/'+phrase).then((notes) =>{
+
+        const tempNotebooks = []
+
+             notes.map((note) => {
+                api.get('/notebooks/'+note.notebookId).then((notebook) => {
+                  tempNotebooks.push(notebook);
+                })
+                console.log(tempNotebooks)
+            })
+            dispatch({type:SEARCHED, tempNotebooks, notes })
+
+        })
+      }
+    }
+
+
 
 // Export the action creators and reducer
 module.exports = reducer;

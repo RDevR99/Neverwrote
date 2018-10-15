@@ -28,7 +28,7 @@ class ActiveNotebook extends React.Component {
     const createNote = (note) => {
 
         if(note.id === this.props.activeNoteId) {
-          return <ActiveNote key={note.id} title={note.title} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote} content={note.content}/>;
+          return <ActiveNote key={note.id} title={note.title} note={note} resetNote={this.props.resetNote} deleteNote={this.props.deleteNote} content={note.content}/>;
         }
         return <Note key={note.id} note={note} loadNoteContent={this.props.loadNoteContent} deleteNote={this.props.deleteNote}/>;
 
@@ -36,7 +36,7 @@ class ActiveNotebook extends React.Component {
 
     const onClickNotebook = (event) => {
       event.preventDefault();
-      this.props.loadNotes(this.props.notebook.id);
+      this.props.resetNotebook();
     };
 
     const onDeleteNotebookButtonClick = (event) => {
@@ -44,8 +44,7 @@ class ActiveNotebook extends React.Component {
     };
 
     const clearInput = () => {
-      console.log('I have been called!');
-      console.table(this.props.notes);
+
       this.setState({
         phrase:'',
         tempNotes: '',
@@ -69,7 +68,7 @@ class ActiveNotebook extends React.Component {
         this.props.notes.map(note => {
 
 
-          if(!(note.title.contains(phrase) || phrase ===''))
+          if(!(note.title.contains(phrase)|| note.content.contains(phrase) || phrase ===''))
           {
             tempNotes.push(note);
           }
@@ -144,7 +143,7 @@ class ActiveNote extends React.Component {
 
     const onClickNote = (event) => {
       event.preventDefault();
-      this.props.loadNoteContent(this.props.note.id);
+      this.props.resetNote();
     };
 
     const onDeleteNoteButtonClick = (event) => {
@@ -195,7 +194,7 @@ class Note extends React.Component {
           {this.props.note.title}
         </a>
 
-        </li>
+      </li>
 
     );
   }
@@ -233,11 +232,31 @@ constructor(props) {
   }
 }
 
+
+class SearchedNote extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render(){
+
+    return (
+      <li className="UnorderedListChildN">
+          {this.props.note.title}   :   {this.props.note.content}
+      </li>
+    );
+  }
+}
+
+
+
 class NotebookList extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      phrase:'',
+    };
   }
 
   render() {
@@ -256,6 +275,8 @@ class NotebookList extends React.Component {
             deleteNote = {this.props.deleteNote}
             createNote = {this.props.createNote}
             activeNotebookId ={this.props.notebooks.activeNotebookId}
+            resetNote = {this.props.resetNote}
+            resetNotebook = {this.props.resetNotebook}
           />
         );
       }
@@ -269,10 +290,93 @@ class NotebookList extends React.Component {
       );
     };
 
+    const onSearching = (event) => {
 
+        const phrase = event.target.value;
+        this.setState({phrase});
+        onSearch(phrase);
+
+    };
+
+    const onSearch = (phrase) => {
+      if(!(phrase===''))
+      {
+        this.props.onSearchNotes(phrase);
+      }
+    };
+
+    const clearInput = () => {
+
+      this.setState({
+        phrase:'',
+      });
+
+      onSearch('  24pytg38vhtu  iohfWCsdvSDV SJKC j njvsdjalvnv;jv;nasv0E GH4[IOGAGIOHfu')
+    };
+
+    const createNote = () => {
+      return this.props.notebooks.searchedNotes.map((note) => {
+
+                return <SearchedNote key={note.id} note={note}/>
+
+                })
+    }
+
+    const loadSearchedNotes = () => {
+
+      console.log('table:')
+      console.table(this.props.notebooks.searchedNotes);
+
+      if(this.state.phrase==="")
+      {
+
+      }
+      else{
+          return(
+                  <ol>
+                  {
+                    createNote()
+                  }
+                  </ol>
+          )
+        }
+
+    }
 
     return (
       <div>
+
+        <div className="input-group">
+
+              <input
+                className="form-control input-lg"
+                value={this.state.phrase}
+                placeholder="Search...."
+                onChange={onSearching}
+
+              />
+
+              <div className="input-group-btn">
+
+                  <button
+                    className="btn btn-warning btn-lg"
+                    style={{marginRight: '12px'}}
+                    onClick={clearInput}
+                  >
+                  <i className="fa fa-eraser"></i>
+                  </button>
+
+              </div>
+        </div>
+
+        <div>
+
+          <p>Search Results</p>
+
+          {loadSearchedNotes()}
+
+        </div>
+
         <h2>Notebooks
         <NotebookNew
             createNotebook={this.props.createNotebook}
@@ -291,9 +395,9 @@ const NotebookListContainer = ReactRedux.connect(
   (state) => {
     return {
     notebooks: state.notebooks,
-    //activeNotebookId: state.activeNotebookId,
     notes: state.notes,
     activeNoteId: state.activeNoteId,
+    searchedNotes: state.searchedNotes,
     };
   },
   createActionDispatchers(notebooksActionCreators)

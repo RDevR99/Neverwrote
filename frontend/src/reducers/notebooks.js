@@ -86,14 +86,16 @@ function reducer(state, action) {
     }
       
     //We create a note by adding them to our list as per the action note.
-    //we then sort the notes.
+    //we then sort the notes and return the new updated state.
     case CREATEN: {
       const unsortedNotes = _.concat(state.notes, action.note);
       const notes = _.orderBy(unsortedNotes,'createdAt','desc');
       return _.assign({},state,{notes});
     }
       
-    //We put the notes from the action
+    //We put the notes from the action into a constant
+    //and then the notebooks are put into the notebooks constant
+  	//We then return a new state which is the old state being assigned a new aray of searched notes.
     case SEARCHED: {
       const searchedNotes = action.notes;
       const notebooks = action.tempNotebooks;
@@ -103,8 +105,12 @@ function reducer(state, action) {
   }
 }
 
-// Action creators
-/* *** TODO: Put action creators here *** */
+// The following are all the action creators that we have utilized.
+
+/* This is the load notes action creator which takes a notebookId as a parameter 
+ * and sends a get request to the api, for the notebooks to get notes in a particular notebookId
+ * After getting all those notes we dispatch an UPDATE action which return notes and the corresponding notebookId
+ */
 reducer.loadNotes = (notebookId) => {
   return (dispatch) => {
     api.get('/notebooks/'+notebookId+'/notes').then((notes) => {
@@ -113,6 +119,11 @@ reducer.loadNotes = (notebookId) => {
   }
 }
 
+/* This is the loadNoteContent reducer, which takes in a noteId and gives a call to the api for 
+ * notes to get a note with a particular noteId
+ * then after getting that note we dispatch the SHOW action with that particular noteId
+ * If there is no such noteId then there wont be anything showing up.
+ */
 reducer.loadNoteContent = (noteId) => {
   return(dispatch) => {
     api.get('/notes/'+noteId).then((note) => {
@@ -121,19 +132,32 @@ reducer.loadNoteContent = (noteId) => {
   }
 }
 
+
+/* This is the reset Note action dispatcher, It takes no argumentws and resets 
+ * the active note back to -1 so that no note is active
+ */
 reducer.resetNote = () => {
   return(dispatch) => {
     dispatch({type:RESETNOTE})
   }
 }
 
+/* This is the reset notebook action dispatcher
+ * It resets the activeNotebookid in the state to be -1
+ * which makes all the notebooks as normal notebooks
+ */
 reducer.resetNotebook = () => {
   return(dispatch) => {
-    console.log('calling reset');
     dispatch({type:RESETNOTEBOOK})
   }
 }
 
+
+/* This is the deleteNotebook action dispatcher 
+ * It takes a particular notebookId as a parameter and then makes a delete call to the api
+ * so that particular notebook will get deleted
+ * we then pass an action which will change the state and makes our changes visible
+ */
 reducer.deleteNotebook = (notebookId) => {
   return(dispatch) => {
     api.delete('/notebooks/'+notebookId).then((notebook)=> {

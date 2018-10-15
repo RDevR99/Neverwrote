@@ -59,7 +59,9 @@ class NoteEdit extends React.Component {
     };
     
     
-	//We return a form
+	//We return a form with space to enter title and content
+    //For content we are using the MarkDownEditor already provided 
+    //The functionality of all the buttons are explained above.
     return(
       <form className="blog-post">
 
@@ -88,4 +90,5 @@ class NoteEdit extends React.Component {
   }
 }
 
+//We export NoteEdit.
 module.exports = NoteEdit;

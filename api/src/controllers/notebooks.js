@@ -1,23 +1,23 @@
 const express = require("express");
 const _ = require("lodash");
 const models = require("../models");
-
 const router = express.Router();
 
-//Selects only the fields that are allowed to be set by users
+//Takes in the fields that are allowed to be set by the users.
 function postFilter(obj) {
   return _.pick(obj, ['title']);
 }
 
-// Index
-//Returns a list of all notebooks
+// The following returns all the notebooks in the order of their creation date, it also catched the exception that might get caught.
 router.get("/", (req, res) => {
   models.Notebook.findAll({ order: [["createdAt", "DESC"]] })
     .then(notebooks => res.json(notebooks))
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-//Returns a list of all notes for a particular notebook.
+/* The following returns all the notes that belong to a particular notebookId,
+ * It would return an erorr if this is not successful
+ */
 router.get("/:notebookId/notes",(req,res) => {
 	models.Note.findAll({where:{notebookId: req.params.notebookId}})
     .then(notes => res.json(notes))

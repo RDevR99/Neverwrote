@@ -502,17 +502,28 @@ var notebooksActionCreators = require('../reducers/notebooks');
 var NotebookNew = require('./NotebookNew');
 var NoteNew = require('./NoteNew');
 
+/*This is the Active Notebook class that represents a note which is clicked
+ * and is supposed to show it's contents (notes) . If clicked again it will reset
+ * the state and make active Notebook Id to -1 through calling the reducer resetNotebook()
+ * passed to this component through its parent class, NotebookList.
+ * Thus, Turning this Active note into a normal note.
+ */
+
 var ActiveNotebook = function (_React$Component) {
   _inherits(ActiveNotebook, _React$Component);
 
+  //The constructor for using state.
   function ActiveNotebook(props) {
     _classCallCheck(this, ActiveNotebook);
 
+    //Here we provide the state.
     var _this = _possibleConstructorReturn(this, (ActiveNotebook.__proto__ || Object.getPrototypeOf(ActiveNotebook)).call(this, props));
 
     _this.state = {
 
+      //phrase is the search phrase. This is the phrase that is being typed in the search bar.
       phrase: '',
+      //This stores notes that are not matching the search phrase.
       tempNotes: ''
 
     };
@@ -520,58 +531,109 @@ var ActiveNotebook = function (_React$Component) {
     return _this;
   }
 
+  //This is what ActiveNotebook needs to render and what it is supposed to render.
+
+
   _createClass(ActiveNotebook, [{
     key: 'render',
     value: function render() {
       var _this2 = this;
 
+      /* This is the createNote function which takes a note object as a parameter and returns either
+       * an ActiveNote or a simple Note. Active note, similarly like an Active Notebook is supposed
+       * to show its content, it is the resultant of a normal note being clicked, thus, on re-clicking
+       * or actually clicking it will amke the content disappear and turn it into a normal note.
+       * we will explain how below.
+       */
       var createNote = function createNote(note) {
 
+        /* The decision wether to return an ActiveNote or a normal note happens here.
+         * We store an activeNoteId in the NotebookList state, so it compares a particular note's Id
+         * with the active note Id , and if it turns out to be the active note, we return active note
+         */
         if (note.id === _this2.props.activeNoteId) {
+          //We pass key as the note's Id and the note itself along with it's title and content, we also pass in methods to delete and reset a note
+          //resetting a note mean making it into a normal note.
           return React.createElement(ActiveNote, { key: note.id, title: note.title, note: note, resetNote: _this2.props.resetNote, deleteNote: _this2.props.deleteNote, content: note.content });
         }
+        //We pass key as the note's Id and methods to load the note's ocntent and to delete a note
+        //To load a note is basically making the note active and load it's contents.
         return React.createElement(Note, { key: note.id, note: note, loadNoteContent: _this2.props.loadNoteContent, deleteNote: _this2.props.deleteNote });
       };
 
+      /*  The function that is called when we click an Active notebook
+       *  The normal notebook have one of it's own.
+       */
       var onClickNotebook = function onClickNotebook(event) {
+
         event.preventDefault();
+        //This will call the reducer to reset the active notebook back to a normal notebook.
         _this2.props.resetNotebook();
       };
 
+      // The fuction which is called when you press the delete button
       var onDeleteNotebookButtonClick = function onDeleteNotebookButtonClick(event) {
+
+        //This will pass the notebookId to the action creator in the reducer.
         _this2.props.deleteNotebook(_this2.props.notebook.id);
       };
 
+      //This is the function used moostly by the eraser button in the search bar.
+      //other fucntions use it if we want everything back to intital state.
       var clearInput = function clearInput() {
 
+        //It sets the current state to how it looked like initially.
         _this2.setState({
           phrase: '',
           tempNotes: ''
         });
+        //It searches an empty string. Thus no results pop up. Just like the initial state.
         onSearch('');
       };
 
+      //This is called when we change the input in the search bar.
       var onSearching = function onSearching(event) {
 
+        //We record the typed text in our constant, phrase
         var phrase = event.target.value;
+        //We set the state's phrase to out phrase
         _this2.setState({ phrase: phrase });
+        //This further calls out another helper method which does the further procedure.
         onSearch(phrase);
       };
 
+      //This is the function that is called by the onSearching function.
       var onSearch = function onSearch(phrase) {
 
+        //It creates a temporary array which stores all the notes that are not supposed to be shown in the search results
         var tempNotes = [];
+
+        //We set the tempNotes in our state to this empty tempNotes.To not to keep on adding stuffs in it.
+        //If we dont do this, on one stage, we wont see anything in the search results.
         _this2.setState({ tempNotes: tempNotes });
 
+        //For each notes we check if it has what it takes to be in the search results
         _this2.props.notes.map(function (note) {
 
+          //If the tile or the contents of a note have that phrase in it somewehere, we do not push the note
+          //The Empty phrase means initial state or no searching state, where all notes are supposed to be there
+          //Thus, if the phrase id empty string we do not push the note.
           if (!(note.title.contains(phrase) || note.content.contains(phrase) || phrase === '')) {
             tempNotes.push(note);
           }
         });
 
+        //we finally set the tempNotes in state to be the one we just prepared.
         _this2.setState({ tempNotes: tempNotes });
       };
+
+      //The return statement shows what we are supposed to provide
+      //A notebook title, click it and it becomes normal
+      //A delete button
+      //A search bar with an eraser
+      //Add new note button
+      //Search results
+      //We use _.difference to display only the notes which are not in tempNotes, basically we are displayin search results.
 
       return React.createElement(
         'li',
@@ -638,6 +700,11 @@ var ActiveNotebook = function (_React$Component) {
   return ActiveNotebook;
 }(React.Component);
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//ActiveNote, which is the note that is highlighted and displays some content
+
+
 var ActiveNote = function (_React$Component2) {
   _inherits(ActiveNote, _React$Component2);
 
@@ -647,21 +714,31 @@ var ActiveNote = function (_React$Component2) {
     return _possibleConstructorReturn(this, (ActiveNote.__proto__ || Object.getPrototypeOf(ActiveNote)).call(this, props));
   }
 
+  //The following is what that is going to be rendered and what assisting render
+
+
   _createClass(ActiveNote, [{
     key: 'render',
     value: function render() {
       var _this4 = this;
 
+      //This is the function which is executed when a Note is clicked.
       var onClickNote = function onClickNote(event) {
         event.preventDefault();
+        //This is the function that was passed to the Active note, which goes to the reducer and invokes action of reseting a note to it's normal state
         _this4.props.resetNote();
       };
 
+      //This is the function that is going to be invoked when we click the delete button.
       var onDeleteNoteButtonClick = function onDeleteNoteButtonClick(event) {
         event.preventDefault();
+        //This is the function that was passed to the Active note, which goes to the reducer and invokes action of deleting a note.
         _this4.props.deleteNote(_this4.props.note.id);
       };
 
+      //We return a list element with a clickable title, which on clicking reverts back to normal,
+      //A delete button which deletes the note
+      //And the content of the note.
       return React.createElement(
         'li',
         { className: 'UnorderedListChildN' },
@@ -684,6 +761,11 @@ var ActiveNote = function (_React$Component2) {
   return ActiveNote;
 }(React.Component);
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//The class Note that renders a normal note with ability to being delted and show content
+
+
 var Note = function (_React$Component3) {
   _inherits(Note, _React$Component3);
 
@@ -698,16 +780,21 @@ var Note = function (_React$Component3) {
     value: function render() {
       var _this6 = this;
 
+      //Fucntion called when note is clicked
       var onClickNote = function onClickNote(event) {
         event.preventDefault();
+        //contents loaded when note clicked, call creating an action.
         _this6.props.loadNoteContent(_this6.props.note.id);
       };
 
+      //Function called when delete button is clicked
       var onDeleteNoteButtonClick = function onDeleteNoteButtonClick(event) {
         event.preventDefault();
+        //Note delted, call creating action to delete the note.
         _this6.props.deleteNote(_this6.props.note.id);
       };
 
+      //We return a list element with a delete button and the note title
       return React.createElement(
         'li',
         { className: 'UnorderedListChildN' },
@@ -728,6 +815,11 @@ var Note = function (_React$Component3) {
   return Note;
 }(React.Component);
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//The class Notebook, responsible for redering a normal notebook
+
+
 var Notebook = function (_React$Component4) {
   _inherits(Notebook, _React$Component4);
 
@@ -737,20 +829,28 @@ var Notebook = function (_React$Component4) {
     return _possibleConstructorReturn(this, (Notebook.__proto__ || Object.getPrototypeOf(Notebook)).call(this, props));
   }
 
+  //The following is what which will render or assist to render.
+
+
   _createClass(Notebook, [{
     key: 'render',
     value: function render() {
       var _this8 = this;
 
+      //This is the function which is called when a Notebook title is clicked
       var onClickNotebook = function onClickNotebook(event) {
         event.preventDefault();
+        //The below function was passed to the notes by NotebookList, it invokes action to load all the notes under this notebook.
         _this8.props.loadNotes(_this8.props.notebook.id);
       };
 
+      //This is the function which is called when we press the delete button next to notebook.
       var onDeleteNotebookButtonClick = function onDeleteNotebookButtonClick(event) {
+        //This will further dispatch an action and delete the notebook hose ID is passed in.
         _this8.props.deleteNotebook(_this8.props.notebook.id);
       };
 
+      //We return a list element with a title and the delete button
       return React.createElement(
         'li',
         { className: 'UnorderedListChildNB' },
@@ -764,14 +864,17 @@ var Notebook = function (_React$Component4) {
           { className: 'Red-Cross btn btn-danger btn-xs', onClick: onDeleteNotebookButtonClick },
           React.createElement('i', { className: 'fa fa-remove' })
         )
-      )
-      //New comment d
-      ;
+      );
     }
   }]);
 
   return Notebook;
 }(React.Component);
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//This class is responsible for the search results we get from the search which uses API.
+
 
 var SearchedNote = function (_React$Component5) {
   _inherits(SearchedNote, _React$Component5);
@@ -799,28 +902,43 @@ var SearchedNote = function (_React$Component5) {
   return SearchedNote;
 }(React.Component);
 
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//This is the NotebookList class which represents the Notebook List and everything included in it.
+
+
 var NotebookList = function (_React$Component6) {
   _inherits(NotebookList, _React$Component6);
 
   function NotebookList(props) {
     _classCallCheck(this, NotebookList);
 
+    //This state has the phrase entered in the main API search bar(lets call it that for short)
     var _this10 = _possibleConstructorReturn(this, (NotebookList.__proto__ || Object.getPrototypeOf(NotebookList)).call(this, props));
 
     _this10.state = {
       phrase: ''
     };
+
     return _this10;
   }
+
+  //Following is what that is rendered and assisting in rendering by the notebookList/
+
 
   _createClass(NotebookList, [{
     key: 'render',
     value: function render() {
       var _this11 = this;
 
+      //This is the function which is called the very first by the NotebookList, it fills up our Notebooks
       var createNotebookListItem = function createNotebookListItem(notebook) {
 
+        //We have activeNotebookId in the notebook state which represents the clicked notebook
+        //Initially, the value of the activeNotebookId will be -1, so all normal notes will be returned and rendered.
         if (notebook.id === _this11.props.notebooks.activeNotebookId) {
+
+          //We have discussed all the parameters the ActiveNotebook requies above.
           return React.createElement(ActiveNotebook, {
             key: notebook.id,
             notebook: notebook,
@@ -836,6 +954,9 @@ var NotebookList = function (_React$Component6) {
             resetNotebook: _this11.props.resetNotebook
           });
         }
+
+        //If not active, its a normal notebook, which just needs fuctions to delete and
+        //fucntion to become active.
         return React.createElement(Notebook, {
           key: notebook.id,
           notebook: notebook,
@@ -844,28 +965,42 @@ var NotebookList = function (_React$Component6) {
         });
       };
 
+      //This is function which is called when we change/ type something in the input of the search bar
       var onSearching = function onSearching(event) {
 
+        //The constant phrase takes in the text
         var phrase = event.target.value;
+        //We then set the state to this phrase
         _this11.setState({ phrase: phrase });
+        //We then search for the phrase
         onSearch(phrase);
       };
 
+      //This is the function that carry out searching
       var onSearch = function onSearch(phrase) {
+
+        //if the phrase is in default state or nothing is typed or everything is erased, then nothing is searched.
         if (!(phrase === '')) {
+          //if there is actually something to search, we search
+          //This will lead to dispatching an action that takes responsibility for searching using an api call.
           _this11.props.onSearchNotes(phrase);
         }
       };
 
+      //This is the function invoked when we press the eraser button
       var clearInput = function clearInput() {
 
+        //This brings back the initial state.
         _this11.setState({
           phrase: ''
         });
 
-        onSearch('  24pytg38vhtu  iohfWCsdvSDV SJKC j njvsdjalvnv;jv;nasv0E GH4[IOGAGIOHfu');
+        //We search nothing, like the intial state
+        onSearch('');
       };
 
+      //This is the fuction which will create a notes based on the searchedNotes passed in as props, which came from the api
+      //it calls the SearchedNote component for each note.
       var createNote = function createNote() {
         return _this11.props.notebooks.searchedNotes.map(function (note) {
 
@@ -873,26 +1008,36 @@ var NotebookList = function (_React$Component6) {
         });
       };
 
+      //this is the function which loads notes that were searched
       var loadSearchedNotes = function loadSearchedNotes() {
 
-        if (_this11.state.phrase === "" || _this11.state.phrase === '  24pytg38vhtu  iohfWCsdvSDV SJKC j njvsdjalvnv;jv;nasv0E GH4[IOGAGIOHfu') {} else {
-          return React.createElement(
-            'div',
-            { className: 'search' },
-            React.createElement(
-              'p',
-              { className: 'searchHead' },
-              'Search Results'
-            ),
-            React.createElement(
-              'ol',
-              null,
-              createNote()
-            )
-          );
-        }
+        //If the phrase is in initial state or if the eraser button has been presssed then dont search.
+        if (_this11.state.phrase === "") {}
+        //Else search
+        else {
+            //We return A heading for search results and an ordered list of hte searched notes.
+            return React.createElement(
+              'div',
+              { className: 'search' },
+              React.createElement(
+                'p',
+                { className: 'searchHead' },
+                'Search Results'
+              ),
+              React.createElement(
+                'ol',
+                null,
+                createNote()
+              )
+            );
+          }
       };
 
+      //This is the search bar and the results of the search being displayed
+      //we return an input box which takes text and calls the functions we discussed already
+      //we load the search results
+      //We give the option to add new notebooks
+      //We retrun the list of notebooks too
       return React.createElement(
         'div',
         null,
@@ -945,6 +1090,9 @@ var NotebookList = function (_React$Component6) {
   return NotebookList;
 }(React.Component);
 
+//the below function passes the reducer notebook's state to the NotebookList as props
+
+
 var NotebookListContainer = ReactRedux.connect(function (state) {
   return {
     notebooks: state.notebooks,
@@ -954,6 +1102,7 @@ var NotebookListContainer = ReactRedux.connect(function (state) {
   };
 }, createActionDispatchers(notebooksActionCreators))(NotebookList);
 
+//We export the NotebookListContainer
 module.exports = NotebookListContainer;
 
 },{"../helpers/createActionDispatchers":13,"../reducers/notebooks":16,"./NoteNew":6,"./NotebookNew":9,"lodash":"lodash","react":"react","react-redux":"react-redux"}],9:[function(require,module,exports){

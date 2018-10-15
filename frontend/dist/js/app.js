@@ -102,11 +102,8 @@ var React = require('react');
 
 var NotebookList = require('./NotebookList');
 
-/*
-  *** TODO: Start building the frontend from here ***
-  You should remove the placeholder text and modify the component as you see
-  fit while working on the assignment.
-*/
+//We start building the frontend from here
+//We call the NotebookList which further calls other requried components
 var Home = function Home() {
   return React.createElement(
     'div',
@@ -125,6 +122,7 @@ var Home = function Home() {
   );
 };
 
+//We export our Home Component
 module.exports = Home;
 
 },{"./NotebookList":8,"react":"react"}],4:[function(require,module,exports){
@@ -140,10 +138,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
-/**
- * A markdown editor. Markdown is a very simple language for formatting
- * text that can be converted into HTML.
- */
+//This is the MarkDownEditor
 
 var MarkdownEditor = function (_React$Component) {
   _inherits(MarkdownEditor, _React$Component);

@@ -8,11 +8,8 @@ const React = require('react');
 
 const NotebookList = require('./NotebookList');
 
-/*
-  *** TODO: Start building the frontend from here ***
-  You should remove the placeholder text and modify the component as you see
-  fit while working on the assignment.
-*/
+//We start building the frontend from here
+//We call the NotebookList which further calls other requried components
 const Home = () => (
   <div className="container">
     <h1>Neverwrote</h1>
@@ -23,4 +20,5 @@ const Home = () => (
   </div>
 );
 
+//We export our Home Component
 module.exports = Home;

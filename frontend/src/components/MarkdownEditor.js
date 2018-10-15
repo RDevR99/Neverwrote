@@ -1,9 +1,6 @@
 const React = require('react');
 
-/**
- * A markdown editor. Markdown is a very simple language for formatting
- * text that can be converted into HTML.
- */
+//This is the MarkDownEditor
 class MarkdownEditor extends React.Component {
   componentDidMount() {
     // SimpleMDE must be required here since it's browser-only.

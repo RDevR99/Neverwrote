@@ -875,14 +875,20 @@ var NotebookList = function (_React$Component6) {
 
       var loadSearchedNotes = function loadSearchedNotes() {
 
-        console.log('table:');
-        console.table(_this11.props.notebooks.searchedNotes);
-
-        if (_this11.state.phrase === "") {} else {
+        if (_this11.state.phrase === "" || _this11.state.phrase === '  24pytg38vhtu  iohfWCsdvSDV SJKC j njvsdjalvnv;jv;nasv0E GH4[IOGAGIOHfu') {} else {
           return React.createElement(
-            'ol',
-            null,
-            createNote()
+            'div',
+            { className: 'search' },
+            React.createElement(
+              'p',
+              { className: 'searchHead' },
+              'Search Results'
+            ),
+            React.createElement(
+              'ol',
+              null,
+              createNote()
+            )
           );
         }
       };
@@ -917,11 +923,6 @@ var NotebookList = function (_React$Component6) {
         React.createElement(
           'div',
           null,
-          React.createElement(
-            'p',
-            null,
-            'Search Results'
-          ),
           loadSearchedNotes()
         ),
         React.createElement(

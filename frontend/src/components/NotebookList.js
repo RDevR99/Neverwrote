@@ -324,20 +324,21 @@ class NotebookList extends React.Component {
 
     const loadSearchedNotes = () => {
 
-      console.log('table:')
-      console.table(this.props.notebooks.searchedNotes);
 
-      if(this.state.phrase==="")
+      if(this.state.phrase==="" || this.state.phrase==='  24pytg38vhtu  iohfWCsdvSDV SJKC j njvsdjalvnv;jv;nasv0E GH4[IOGAGIOHfu')
       {
 
       }
       else{
           return(
+                  <div className="search">
+                  <p className="searchHead">Search Results</p>
                   <ol>
                   {
                     createNote()
                   }
                   </ol>
+                  </div>
           )
         }
 
@@ -370,8 +371,6 @@ class NotebookList extends React.Component {
         </div>
 
         <div>
-
-          <p>Search Results</p>
 
           {loadSearchedNotes()}
 

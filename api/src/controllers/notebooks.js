@@ -24,40 +24,37 @@ router.get("/:notebookId/notes",(req,res) => {
   	.catch(err => res.status(500).json({error: err.message}));
 });
 
-//Creates a new notebook using the posted data.
-//Returns the new notebook.
+//THe following creates a notebook based on the post data
 router.post("/", (req, res) => {
   models.Notebook.create(postFilter(req.body))
     .then(notebook => res.json(notebook))
     .catch(err => res.status(422).json({ error: err.message }));
 });
 
-//Returns a single notebook by ID
+//The following return a notebook based on the provided notebook Id
 router.get("/:notebookId", (req, res) => {
   models.Notebook.findById(req.params.notebookId)
     .then(notebook => res.json(notebook))
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-//Deletes a single notebook by ID
+//The following deletes a particular notebook based on the notbookId that has been passed
 router.delete("/:notebookId", (req, res) => {
   models.Notebook.destroy({ where: { id: req.params.notebookId } }) //findById(req.params.notebookId))
     .then(() => res.json({}))
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-//Updates the attributes of a particular notebook.
+//Updates the attributes of a particular notebook
 //Returns the updates notebook.
 router.put("/:notebookId", (req, res) => {
   models.Notebook.findById(req.params.notebookId)
     .then(notebook => notebook.update(postFilter(req.body)))
     .then(notebook => res.json(notebook))
     .catch(err => res.status(500).json({ error: err.message }));
-  /*models.Notebook.update({where:{id: req.params.notebokId}})
-  .then(notebook => res.json(notebook) )
-  .catch(err => res.status())
-  */ //will this work??
+  
 });
+
 
 module.exports = router;
 

@@ -202,7 +202,10 @@ reducer.deleteNote  =(noteId) => {
   }
 }
 
-//This is the onSearchNote
+/* This is the onSearchNotes action dispatcher, It gives an api get call for the search end point which looks for similarity of a phrase 
+ * In the notes, After getting the result, we map all the results to be pushed into the tempNotes array we created and this being done, 
+ * we pass our temp notes and all the notes to carry out the SEARCHED action which is described above already.
+ */
 reducer.onSearchNotes = (phrase) => {
   return(dispatch) => {
     api.get('/search/notes/'+phrase).then((notes) =>{
@@ -213,7 +216,7 @@ reducer.onSearchNotes = (phrase) => {
                 api.get('/notebooks/'+note.notebookId).then((notebook) => {
                   tempNotebooks.push(notebook);
                 })
-                console.log(tempNotebooks)
+                
             })
             dispatch({type:SEARCHED, tempNotebooks, notes })
 
@@ -223,5 +226,5 @@ reducer.onSearchNotes = (phrase) => {
 
 
 
-// Export the action creators and reducer
+// We Export the action creators and reducer
 module.exports = reducer;
